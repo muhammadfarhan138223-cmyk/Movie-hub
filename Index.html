@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Hub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #141414; color: #fff; padding-bottom: 50px; }
+        
+        /* Navbar */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: #000; position: sticky; top: 0; z-index: 100; }
+        .logo { color: #E50914; font-size: 22px; font-weight: bold; letter-spacing: 1px; }
+        .admin-btn { background: #E50914; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+        /* Hero Banner */
+        .hero { height: 200px; background: linear-gradient(to top, #141414, transparent), url('https://images.unsplash.com/photo-1574267432553-4b4628081c31?q=80&w=1000') center/cover; display: flex; align-items: flex-end; padding: 20px; }
+        .hero h1 { font-size: 24px; text-shadow: 2px 2px 4px #000; }
+
+        /* Container & Grid */
+        .container { padding: 20px 4%; }
+        .section-title { font-size: 18px; margin-bottom: 12px; border-left: 4px solid #E50914; padding-left: 8px; }
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+        .movie-card { background: #222; border-radius: 6px; overflow: hidden; position: relative; }
+        .movie-card img { width: 100%; height: 150px; object-fit: cover; display: block; }
+        .movie-card .title { font-size: 12px; padding: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Admin Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; }
+        .modal-content { background: #222; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; }
+        .modal-content h3 { margin-bottom: 15px; color: #E50914; }
+        .modal-content input { width: 100%; padding: 10px; margin-bottom: 10px; background: #333; border: 1px solid #444; color: #fff; border-radius: 4px; }
+        .modal-content button { width: 100%; padding: 10px; background: #E50914; border: none; color: #fff; font-weight: bold; border-radius: 4px; margin-top: 5px; }
+        .close-btn { background: #555 !important; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo">MOVIE HUB</div>
+        <button class="admin-btn" onclick="openAdmin()">+ Admin</button>
+    </div>
+
+    <div class="hero">
+        <h1>Watch Unlimited Movies</h1>
+    </div>
+
+    <div class="container">
+        <h2 class="section-title">Latest Uploads</h2>
+        <div class="movie-grid" id="movieList">
+            <!-- Dynamic Movies Load Hongy -->
+        </div>
+    </div>
+
+    <!-- Admin Upload Modal -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <h3>Upload Movie</h3>
+            <input type="password" id="adminPass" placeholder="Enter Admin Password">
+            <input type="text" id="movieTitle" placeholder="Movie Title">
+            <input type="text" id="moviePoster" placeholder="Poster Image URL">
+            <input type="text" id="movieLink" placeholder="Stream/Embed Video Link">
+            <button onclick="addMovie()">Upload Now</button>
+            <button class="close-btn" onclick="closeAdmin()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Default Local Storage for testing
+        let movies = JSON.parse(localStorage.getItem('myMovies')) || [
+            {
+                title: "Sample Movie",
+                poster: "https://via.placeholder.com/150x220/E50914/ffffff?text=Movie+Hub",
+                link: "#"
+            }
+        ];
+
+        function displayMovies() {
+            const list = document.getElementById('movieList');
+            list.innerHTML = '';
+            movies.forEach((movie) => {
+                list.innerHTML += `
+                    <div class="movie-card" onclick="playMovie('${movie.link}')">
+                        <img src="${movie.poster}" alt="${movie.title}">
+                        <div class="title">${movie.title}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function openAdmin() {
+            document.getElementById('adminModal').style.display = 'flex';
+        }
+
+        function closeAdmin() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function addMovie() {
+            const pass = document.getElementById('adminPass').value;
+            const title = document.getElementById('movieTitle').value;
+            const poster = document.getElementById('moviePoster').value;
+            const link = document.getElementById('movieLink').value;
+
+            // Password Check (Password: 1234)
+            if (pass !== "1234") {
+                alert("Wrong Admin Password!");
+                return;
+            }
+
+            if(!title || !poster || !link) {
+                alert("Please fill all details!");
+                return;
+            }
+
+            movies.push({ title, poster, link });
+            localStorage.setItem('myMovies', JSON.stringify(movies));
+            displayMovies();
+            closeAdmin();
+            alert("Movie Uploaded Successfully!");
+        }
+
+        function playMovie(link) {
+            if(link !== "#") {
+                window.open(link, '_blank');
+            } else {
+                alert("This is a sample movie!");
+            }
+        }
+
+        displayMovies();
+    </script>
+</body>
+</html>
